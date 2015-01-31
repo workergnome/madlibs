@@ -13,7 +13,7 @@ class PhraseBucketer
   end
 
   def add_text(text)
-    phrases = text.gsub(/["”\(\),]/," ").gsub("\n"," ").split(/[\.\:\!,\?;]/).collect do |s|
+    phrases = text.gsub(/["”\(\)]/," ").gsub("\n"," ").split(/[\.\:\!\?;]/).collect do |s|
       phrase =  s.strip
       tagged_phrase = @tgr.add_tags(phrase)
       nouns = @tgr.get_nouns(tagged_phrase)

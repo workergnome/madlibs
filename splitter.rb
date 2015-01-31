@@ -21,7 +21,7 @@ Dir.mkdir "output" unless Dir.exists? ("output")
 corpuses.each do |bucket|
   bucket.phrase_buckets.each do |k,v|
     File.open("output/#{bucket.name}_#{k}.txt", "w") do |file|
-      v.each {|line| file.puts line}
+      v.each {|line| file.puts line.gsub(/\s{2,}/," ") + "."}
     end 
   end
 end
