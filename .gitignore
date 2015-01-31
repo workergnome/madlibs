@@ -8,6 +8,8 @@
 /test/tmp/
 /test/version_tmp/
 /tmp/
+/texts/*
+!/texts/.gitkeep
 
 ## Specific to RubyMotion:
 .dat*
