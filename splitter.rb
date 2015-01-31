@@ -1,6 +1,6 @@
 require_relative 'phrase_bucketer.rb'
 
-MAX_TEXTS = 10
+MAX_TEXTS = 100
 
 corpuses = []
 
@@ -21,7 +21,7 @@ Dir.mkdir "output" unless Dir.exists? ("output")
 corpuses.each do |bucket|
   bucket.phrase_buckets.each do |k,v|
     File.open("output/#{bucket.name}_#{k}.txt", "w") do |file|
-      v.each {|line| file.puts line.gsub(/\s{2,}/," ") + "."}
+      v.each {|line| file.puts line.gsub(/\s{2,}/," ")}
     end 
   end
 end
