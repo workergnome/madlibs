@@ -11,6 +11,7 @@
 /texts/*
 /output
 !/texts/.gitkeep
+!/texts/example
 
 ## Specific to RubyMotion:
 .dat*
