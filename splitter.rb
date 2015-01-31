@@ -1,10 +1,8 @@
-corpuses = []
-
-@sotu_phrases = PhraseBucketer.new("sotu")
-@tv_phrases = PhraseBucketer.new("tv")
-@news_phrases = PhraseBucketer.new("news")
+require_relative 'phrase_bucketer.rb'
 
 MAX_TEXTS = 10
+
+corpuses = []
 
 dirs = Dir['./texts/*/']
 dirs.each do |d|
@@ -27,10 +25,3 @@ corpuses.each do |bucket|
     end 
   end
 end
-
-
-
-
-
-
-

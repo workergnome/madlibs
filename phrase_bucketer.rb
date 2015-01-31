@@ -4,6 +4,8 @@ class PhraseBucketer
 
   attr_reader :phrase_buckets, :name
 
+  NOUN_WILDCARD = "--NOUN--"
+
   def initialize(name)
     @name = name
     @tgr = EngTagger.new   
@@ -17,14 +19,14 @@ class PhraseBucketer
       nouns = @tgr.get_nouns(tagged_phrase)
       
       nouns.each do |noun,val|
-        phrase.gsub!(" #{noun} ", " --NOUN-- ")
+        phrase.gsub!(" #{noun} ", " #{NOUN_WILDCARD} ")
       end if nouns
       phrase_words = phrase.split(" ")
-      if phrase_words.count("--NOUN--") < 6 && 
+      if phrase_words.count(NOUN_WILDCARD) < 6 && 
          phrase_words.count > 5 && 
-         phrase_words.count("--NOUN--") > 0 &&
+         phrase_words.count(NOUN_WILDCARD) > 0 &&
          phrase[0] =~ /[A-Z]/
-         @phrase_buckets[phrase_words.count("--NOUN--")].push phrase
+         @phrase_buckets[phrase_words.count(NOUN_WILDCARD)].push phrase
          phrase
       else
         nil
