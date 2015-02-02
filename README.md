@@ -1,6 +1,8 @@
 # madlibs
 
-Madlib Creator for generating mad lib lines out of texts.  This project was used as part of the **TV Helper** installation at *Art Hack Day: Deluge* at Pioneer Works, NYC in January 2015.
+Madlib Creator is a library for generating madlib sentences out of preexisting text corpuses.
+
+This project was used as part of the **TV Helper** installation at *Art Hack Day: Deluge* at Pioneer Works, NYC in January 2015.
 
 This library will take a collection of text files and create pseudo-mad lib files out of them.  It performs basic POS tagging on text files and selects sentences that fit a pre-defined set of rules, and tags them for noun replacement.
 
