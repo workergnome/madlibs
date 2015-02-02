@@ -24,4 +24,9 @@ corpuses.each do |bucket|
       v.each {|line| file.puts line.gsub(/\s{2,}/," ")}
     end 
   end
+  # bucket.tagged_phrase_buckets.each do |k,v|
+  #   File.open("output/tagged_#{bucket.name}_#{k}.txt", "w") do |file|
+  #     v.each {|line| file.puts line }
+  #   end 
+  # end
 end

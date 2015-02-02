@@ -2,7 +2,7 @@ require 'engtagger'
 
 class PhraseBucketer
 
-  attr_reader :phrase_buckets, :name
+  attr_reader :phrase_buckets, :name, :tagged_phrase_buckets
 
   NOUN_WILDCARD = "--NOUN--"
 
@@ -26,6 +26,7 @@ class PhraseBucketer
     @name = name
     @tgr = EngTagger.new   
     @phrase_buckets = {1 => [], 2 => []}
+    @tagged_phrase_buckets = {1=> [], 2 => []}
   end
 
 
@@ -49,6 +50,7 @@ class PhraseBucketer
     phrases = text.gsub(/["”\(\)]/," ").gsub("\n"," ").split(/[\.\!\?;]/).collect.with_index do |s,i|
       s = s.strip.gsub(FAKE_PERIOD,".")
       phrase =  s.strip
+      tagged_readable_phrase = @tgr.get_readable(phrase)
       tagged_phrase = @tgr.add_tags(phrase)
       nouns = @tgr.get_nouns(tagged_phrase)
       proper = @tgr.get_proper_nouns(tagged_phrase)
@@ -58,20 +60,24 @@ class PhraseBucketer
       end
       
       nouns.each do |noun,val|
-        phrase.gsub!(" #{noun} ", " #{NOUN_WILDCARD} ")
+        s = NOUN_WILDCARD
+        s += "s" if tagged_readable_phrase.include?(" #{noun}/NNS ")        
+        phrase.gsub!(" #{noun} ", " #{s} ")
       end if nouns
       phrase_words = phrase.split(" ")
-      if phrase_words.count(NOUN_WILDCARD) < 3 && 
+      number_of_nouns = (phrase.split(NOUN_WILDCARD).count) -1
+#      puts phrase, number_of_nouns
+      if number_of_nouns < 3 && 
          phrase_words.count > 5 && 
-         phrase_words.count(NOUN_WILDCARD) > 0 &&
+         number_of_nouns > 0 &&
          phrase_words.count < 14 && 
          phrase[0] =~ /[A-Z]/
-         @phrase_buckets[phrase_words.count(NOUN_WILDCARD)].push(phrase + (punctuations[i].gsub(";","."))) rescue nil
+         @phrase_buckets[number_of_nouns].push(phrase + (punctuations[i].gsub(";","."))) rescue nil
          phrase
       else
         nil
       end
-    end.compact
+    end.compact.uniq
   end
 
 end
