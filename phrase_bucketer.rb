@@ -2,7 +2,7 @@ require 'engtagger'
 
 class PhraseBucketer
 
-  attr_reader :phrase_buckets, :name, :tagged_phrase_buckets
+  attr_reader :phrase_buckets, :name, :tagged_phrase_buckets, :removed_nouns
 
   NOUN_WILDCARD = "--NOUN--"
 
@@ -23,6 +23,7 @@ class PhraseBucketer
                     'Jan.', "Feb.", "Mar.", "Apr.", "Jun.", "Jul.", "Aug.", "Sept.", "Sep.", "Oct.", "Nov.", "Dec."]
 
   def initialize(name)
+    @removed_nouns = []
     @name = name
     @tgr = EngTagger.new   
     @phrase_buckets = {1 => [], 2 => []}
@@ -31,21 +32,28 @@ class PhraseBucketer
 
 
   def substitute_periods(text)
-    modified = text.gsub(/b\.\s?(\d{4})/, "b#{FAKE_PERIOD} \\1") || text  # born
-    modified.gsub!(/d\.\s?(\d{4})/, "d#{FAKE_PERIOD} \\1")   # died
-    initials = modified.scan(/(?:^|\s|\()((?:[A-Zc]\.)+)/) # initials, circas
-    initials.each do |i|
-      modified.gsub!(i[0],i[0].gsub(".",FAKE_PERIOD,))
+    begin
+      modified = text.gsub(/b\.\s?(\d{4})/, "b#{FAKE_PERIOD} \\1") || text  # born
+      modified.gsub!(/d\.\s?(\d{4})/, "d#{FAKE_PERIOD} \\1")   # died
+      initials = modified.scan(/(?:^|\s|\()((?:[A-Zc]\.)+)/) # initials, circas
+      initials.each do |i|
+        modified.gsub!(i[0],i[0].gsub(".",FAKE_PERIOD,))
+      end
+      ABBREVIATIONS.each do |title|
+       mod_title = title.gsub('.','\.')
+       modified.gsub!(/\b#{mod_title}/, mod_title.gsub('\.',FAKE_PERIOD))
+      end
+      return modified
+    rescue => e
+      puts "Problem : #{e}"
+      return nil
     end
-    ABBREVIATIONS.each do |title|
-     mod_title = title.gsub('.','\.')
-     modified.gsub!(/\b#{mod_title}/, mod_title.gsub('\.',FAKE_PERIOD))
-    end
-    modified
   end
 
   def add_text(text)
+    return [] if text.nil?
     text = substitute_periods(text)
+    return [] if text.nil?
     punctuations = text.scan(/[\.\!\?;]/)
     phrases = text.gsub(/["”\(\)]/," ").gsub("\n"," ").split(/[\.\!\?;]/).collect.with_index do |s,i|
       s = s.strip.gsub(FAKE_PERIOD,".")
@@ -63,6 +71,7 @@ class PhraseBucketer
         s = NOUN_WILDCARD
         s += "s" if tagged_readable_phrase.include?(" #{noun}/NNS ")        
         phrase.gsub!(" #{noun} ", " #{s} ")
+        @removed_nouns.push noun
       end if nouns
       phrase_words = phrase.split(" ")
       number_of_nouns = (phrase.split(NOUN_WILDCARD).count) -1
@@ -78,6 +87,6 @@ class PhraseBucketer
         nil
       end
     end.compact.uniq
+    @removed_nouns = @removed_nouns.compact.uniq.sort
   end
-
 end

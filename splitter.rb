@@ -24,6 +24,11 @@ corpuses.each do |bucket|
       v.each {|line| file.puts line.gsub(/\s{2,}/," ")}
     end 
   end
+  File.open("output/#{bucket.name}_removed_nouns.txt", "w") do |file|
+    bucket.removed_nouns.each do |noun|
+      file.puts noun
+    end
+  end   
   # bucket.tagged_phrase_buckets.each do |k,v|
   #   File.open("output/tagged_#{bucket.name}_#{k}.txt", "w") do |file|
   #     v.each {|line| file.puts line }
